@@ -1,0 +1,18 @@
+PROJECT_ROOT = /absolute/path/to/your/project
+
+
+DATASET_DIR = dataset
+DATASET_NAME = diabetes.csv
+
+
+MODEL_NAME = diabetes_prediction_model.joblib
+MODEL_DIR = model_dir
+
+
+LOG_DIR = logs
+LOG_NAME = app.log
+
+
+TARGET_COL = target
+TEST_SIZE = 0.2
+RANDOM_STATE = 40

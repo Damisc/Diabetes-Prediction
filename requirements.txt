@@ -4,3 +4,9 @@ matplotlib
 seaborn
 xgboost
 scikit-learn
+scipy
+python-dotenv
+joblib
+pydantic
+fastapi
+uvicorn
