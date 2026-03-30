@@ -1,4 +1,4 @@
-import os 
+import yaml
 import logging
 from pathlib import Path
 
@@ -20,6 +20,8 @@ from sklearn.metrics import (
     recall_score,
     f1_score
 )
+
+from common import replace_zeros_with_nan
 
 def train_model():
     try:
@@ -48,6 +50,8 @@ def train_model():
             ]
         )
 
+        logging.info("Starting Diabetes Model Training")
+
         # Load Data
         df = pd.read_csv(DATASET_PATH)
         logging.info(f"Dataset Loaded With Shape: {df.shape}")
@@ -65,25 +69,27 @@ def train_model():
             stratify=y
         )
 
+        logging.info(f"Train Shape: {X_train.shape}, Test Shape: {X_test.shape}")
 
 
         # changing the 0 values to NAN for selected columns ----> Median imutation
-        zero_as_missing_cols = ["Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI"]
-
-        numerical_feature = X_train.select_dtypes(include=[np.number]).columns.tolist()
-
-
-        numerical_transformer = Pipeline(
-            steps=[
-                ("imputer", SimpleImputer(missing_values=0, strategy="median")),
-                ("scaler", StandardScaler())
-            ]
-        )
+        numerical_cols = X_train.select_dtypes(include=[np.number]).columns.tolist()
 
         preprocess = ColumnTransformer(
             transformers=[
-                ("num", numerical_transformer, numerical_feature)
-            ]
+                (
+                    "num",
+                    Pipeline(
+                        steps=[
+                            ("zero_to_nan", FunctionTransformer(replace_zeros_with_nan, kw_args={"cols": ["Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI"]}, validate=False)),
+                            ("imputer", SimpleImputer(strategy="median")),
+                            ("scaler", StandardScaler())
+                        ]
+                    ),
+                    numerical_cols
+                )
+            ],
+            remainder="drop"
         )
 
         # Best Model Parameter from Notebook tuning
